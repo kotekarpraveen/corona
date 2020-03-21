@@ -8,6 +8,13 @@ var coronadata =
     coronalist:"",
     dateselected:"",
     markupdata:[],
+    worldconfirmedcount:"",
+    worldrecoveredcount:"",
+    worlddeathcount:"",
+    indiaconfirmedcount:"",
+    indiarecoveredcount:"",
+    indiadeathcount:"",
+    
     getDataList:function()
     {
         var _this = this;
@@ -33,6 +40,10 @@ var coronadata =
     renderMap:function(data)
     {
         var _this = this;
+
+
+         
+
         //Get list by date wise\
         data.forEach(function(val)
         {
@@ -46,7 +57,7 @@ var coronadata =
             }
         });
 
-        console.log(_this.datedata);
+        //console.log(_this.datedata);
 
         var currentdate = moment().add(-1, 'days').format("YYYY-MM-DD");
         if(_this.dateselected)
@@ -54,19 +65,32 @@ var coronadata =
             currentdate = _this.dateselected;
         }
 
-        console.log(currentdate);
+        //console.log(currentdate);
 
         for(var i in _this.datedata[currentdate])
         {
             var state="";
+            _this.worldconfirmedcount=Number(_this.worldconfirmedcount)+Number(_this.datedata[currentdate][i][5]);
+
+            _this.worldrecoveredcount=Number(_this.worldrecoveredcount)+Number(_this.datedata[currentdate][i][6]);
+
+            _this.worlddeathcount=Number(_this.worlddeathcount)+Number(_this.datedata[currentdate][i][7]);
+
+
             if(_this.datedata[currentdate][i][0] != "")
             {
-                console.log(_this.datedata[currentdate][i][0]);
+               // console.log(_this.datedata[currentdate][i][0]);
                 state = _this.datedata[currentdate][i][0];
             }
             var html = "</br>State:"+state+"</br>Confrimed cases:"+_this.datedata[currentdate][i][5]+"</br>Recoverd cases:"+_this.datedata[currentdate][i][6]+"</br>Death cases:"+_this.datedata[currentdate][i][7];
             _this.markupdata.push(html);
         }
+
+        console.log("WOrld confirmed count"+_this.worldconfirmedcount);
+
+        console.log("WOrld recovered count"+_this.worldrecoveredcount);
+
+        console.log("WOrld death count"+_this.worlddeathcount);
 
         $('#world-map-markers').vectorMap({
             map: 'world_mill_en',
@@ -117,6 +141,28 @@ var coronadata =
                   }
                 }
             },
+            series: {
+                markers: [{
+                 
+                  scale: {
+                    'Confirmed': '',
+                    'Recovered': '',
+                    'Death': ''
+                  },
+                 value:"",
+                  legend: {
+                    horizontal: true,
+                    title: 'Total number of corona cases till now',
+                    labelRender: function(v){
+                      return {
+                        Confirmed: _this.worldconfirmedcount,
+                        Recovered: _this.worldrecoveredcount,
+                        Death: _this.worlddeathcount
+                      }[v];
+                    }
+                  }
+                }]
+              },
             onMarkerLabelShow: function(event, label, code) 
             {
              label.html("<strong>"+label.html()+"</strong>"+_this.markupdata[code]);                
@@ -129,6 +175,19 @@ var coronadata =
                 label.html("<strong>"+label.html()+"</strong>"+_this.markupdata[code]);
             }
           });
+
+          //Donut Chart
+        var donut = new Morris.Donut({
+            element: 'sales-chart',
+            resize: true,
+            colors: ["#e3a211", "#21db1e", "#db1e1e"],
+            data: [
+            {label: "Confirmed cases", value: _this.worldconfirmedcount},
+            {label: "Recoverd cases", value: _this.worldrecoveredcount},
+            {label: "Death cases", value: _this.worlddeathcount}
+            ],
+            hideHover: 'auto'
+        });
     }
 };
 
