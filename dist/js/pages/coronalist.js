@@ -3,7 +3,8 @@ var coronadata =
     init:function()
 	{
         this.getDataList();
-    //    / this.getIndiaDataList();
+        this.getIndiaDataList();
+        this.listHelpContact();
     },
     datedata:[],
     coronalist:"",
@@ -12,12 +13,15 @@ var coronadata =
     worldconfirmedcount:"",
     worldrecoveredcount:"",
     worlddeathcount:"",
+    indiatotalcount:"",
     indiaconfirmedcount:"",
+    indiaconfirmedforeigncount:"",
     indiarecoveredcount:"",
     indiadeathcount:"",
     statelist:[],
     statecode:[],
     swapstate:[],
+    swaprevstate:[],
     statedata:[],
 
     
@@ -31,6 +35,9 @@ var coronadata =
             success:function(data)
             {
                 data = $.csv.toArrays(data);
+                _this.worldconfirmedcount="";
+                _this.worldrecoveredcount="";
+                _this.worlddeathcount="";
                 console.log(data);
                 _this.coronalist = data;
                 _this.renderMap(data);
@@ -81,9 +88,15 @@ var coronadata =
         {
             console.log('Data not found');
         }
+       
         for(var i in _this.datedata[currentdate])
         {
-            console.log("Current date data"+currentdate);
+           // console.log("Current date data"+currentdate);
+           // console.log("WOrld confirmed before count"+_this.worldconfirmedcount);
+
+           // console.log("WOrld recovered before count"+_this.worldrecoveredcount);
+    
+            //console.log("WOrld death before count"+_this.worlddeathcount);
             var state="";
             _this.worldconfirmedcount=Number(_this.worldconfirmedcount)+Number(_this.datedata[currentdate][i][5]);
 
@@ -224,7 +237,7 @@ var coronadata =
                 for(i in response.data.regional)
                 {
                     console.log(response.data.regional[i].loc);
-                    _this.statelist.push(response.data.regional[i].loc);
+                  //  _this.statelist.push(response.data.regional[i].loc);
                 }
 
                 console.log(_this.statelist);
@@ -240,7 +253,7 @@ var coronadata =
          });
     },
 
-    renderIndiaMap:function(data)
+    renderIndiaMap:function(indiadata)
     {
     
         var _this = this;
@@ -287,9 +300,29 @@ var coronadata =
                 _this.swapstate[value[1]] = value[0];
               });
 
+              _this.indiatotalcount = indiadata.data.summary.total;
+              _this.indiaconfirmedcount = indiadata.data.summary.confirmedCasesIndian;
+              _this.indiaconfirmedforeigncount = indiadata.data.summary.confirmedCasesForeign;
+              _this.indiarecoveredcount = indiadata.data.summary.discharged;
+              _this.indiadeathcount = indiadata.data.summary.deaths;
 
-            //_this.statedata[]
-            
+              for(i in indiadata.data.regional)
+              {
+                  //console.log(indiadata.data.regional[i].loc);
+               // _this.statelist[_this.swapstate[indiadata.data.regional[i].loc]]=indiadata.data.regional[i];
+                /*   _this.statelist.push(indiadata.data.regional[i].loc); */
+
+                var html ="";
+                html+="</br>Confirmed cases Indian:"+indiadata.data.regional[i]['confirmedCasesIndian'];
+                html+="</br>Confirmed cases Foreign:"+indiadata.data.regional[i]['confirmedCasesForeign'];
+                html+="</br>Discharged:"+indiadata.data.regional[i]['discharged'];
+                html+="</br>Death:"+indiadata.data.regional[i]['deaths'];
+
+                _this.statelist[_this.swapstate[indiadata.data.regional[i].loc]]= html;
+              }
+
+            // /_this.statedata[]
+            console.log(_this.statelist);
             console.log(data);
             console.log(_this.statecode);
             console.log(_this.swapstate);
@@ -300,6 +333,14 @@ var coronadata =
             hoverOpacity: 0.7,
             hoverColor: true,
             backgroundColor: 'transparent',
+            regionLabelStyle: {
+                initial: {
+                  fill: '#B90E32'
+                },
+                hover: {
+                  fill: 'red'
+                }
+              },
             regionStyle: {
               initial: {
                 /* fill: 'rgba(210, 214, 222, 1)',
@@ -320,49 +361,73 @@ var coronadata =
               selectedHover: {
               }
             },
-            markerStyle: {
+            markerLabelStyle:
+            {
+                initial: {
+                    'font-family': 'Verdana',
+                    'font-size': '12',
+                    'font-weight': 'bold',
+                    cursor: 'default',
+                    fill: 'black'
+                  },
+                  hover: {
+                    cursor: 'pointer'
+                  }
+            },
+             markerStyle: {
               initial: {
-                fill: 'black',
+                fill: '#000007',
                 stroke: '#1111'
               }
-            },
+            }, 
             
-            markers:["Andhra Pradesh", "Chhattisgarh", "Delhi", "Gujarat", "Haryana", "Himachal Pradesh", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Tamil Nadu", "Telengana", "Chandigarh", "Jammu and Kashmir", "Ladakh", "Uttar Pradesh", "Uttarakhand", "West Bengal"],
+            markers:[{latLng:[11.059821,78.387451],name:"Tamil Nadu"},
+
+            {latLng:[17.123184,79.208824],name:"Telangana"},
+            {latLng:[23.473324,77.947998],name:"Madhya Pradesh"},
+            
+            {latLng:[29.238478,76.431885],name:"Haryana"},
+            {latLng:[21.295132,81.828232],name:"Chhattisgarh"},
+            {latLng:[29.065773,76.040497],name:"Haryana"},
+            {latLng:[25.794033,78.116531],name:"Bhitarwar, Madhya Pradesh"},
+            
+            
+            {latLng:[19.601194,75.552979],name:"Maharashtra"},
+            
+            
+            {latLng:[23.745127,91.746826],name:"Tripura"},
+            {latLng:[17.874857,78.100815],name:"Chandoor, Telangana"},
+            {latLng:[15.317277,75.71389],name:"Karnataka"},
+            {latLng:[10.850516,76.27108],name:"Kerala"},
+            {latLng:[28.207609,79.82666],name:"Uttar Pradesh"},
+            {latLng:[26.244156,92.537842],name:"Assam"},
+            {latLng:[19.66328,75.300293],name:"Maharashtra"},
+            {latLng:[22.978624,87.747803],name:"West Bengal"},
+            {latLng:[22.309425,72.13623],name:"Gujarat"},
+            {latLng:[20.94092,84.803467],name:"Odisha"},
+            {latLng:[27.391277,73.432617],name:"Rajasthan"},
+            {latLng:[32.084206,77.571167],name:"Himachal Pradesh"}
+            ],
             labels: {
-                markers: {
-                  render: function(index){
-                    //return plants[index].name;
-                    return "<strong></strong>"+_this.markupdata[index];
+                regions: {
+                    render: function(code){
+                     // return _this.statelist[code] && jvm.Map.maps['in_mill'].paths[code].name;
+                     return code;
+                    },
+                    offsets: function(code){
+                    return code;
+                    }
                   },
-                  offsets: function(index){
-                    var offset = _this.markupdata[index]['offsets'] || [0, 0];
-        
-                    return [offset[0] - 7, offset[1] + 3];
-                  }
-                }
+
+               
             },
             series: {
-                markers: [{
-                 
-                  scale: {
-                    'Confirmed': '',
-                    'Recovered': '',
-                    'Death': ''
-                  },
-                 value:"",
-                  legend: {
-                    horizontal: true,
-                    title: 'Total number of corona cases till now',
-                    labelRender: function(v){
-                      return {
-                        Confirmed: _this.worldconfirmedcount,
-                        Recovered: _this.worldrecoveredcount,
-                        Death: _this.worlddeathcount
-                      }[v];
-                    }
-                  }
+                regions: [{
+                  values: _this.statecode,
+                  attribute: "fill"
                 }]
               },
+              
             onMarkerLabelShow: function(event, label, code) 
             {
              label.html("<strong>"+label.html()+"</strong>"+_this.markupdata[code]);                
@@ -372,7 +437,8 @@ var coronadata =
                   '<b>'+label.html()+'</b></br>'+
                   '<b>Unemployment rate: </b>'+12+'%'
                 ); */
-                label.html("<strong>"+label.html()+"</strong>"+markupdata[code]+code);
+                console.log(label);
+                label.html("<strong>"+label.html()+"</strong>"+_this.statelist[code]);
               },
            /*  onMarkerTipShow:function(event, label, code) 
             {
@@ -383,9 +449,86 @@ var coronadata =
             }
           });
 
+
+          var donut = new Morris.Donut({
+            element: 'india-chart',
+            resize: true,
+            colors: ["#c3a211","#f3a211","#e3a211", "#21db1e", "#db1e1e"],
+            data: [
+            {label: "Total", value: _this.indiatotalcount},
+            {label: "Confirmed Indian", value: _this.indiaconfirmedcount},
+            {label: "Confirmed Foreign return", value: _this.indiaconfirmedforeigncount},
+            {label: "Recovered", value: _this.indiarecoveredcount},
+            {label: "Death", value: _this.indiadeathcount}
+            ],
+            hideHover: 'auto'
+        });
+
+    },
+
+    listHelpContact:function()
+    {
+        var _this = this;
+        var ajaxresult = $.ajax({
+            type:"GET",
+            url:"https://api.rootnet.in/covid19-in/contacts",
+            contentType:false,
+            processData:false,
+            global:false,
+            async:false,
+            success:function(data)
+            {
+                
+                console.log(data);
+                _this.renderContact(data);
+            },
+            error:function(error)
+            {
+                console.log(error);
+            }
+            
+            
+         });
+    },
+    renderContact:function(data)
+    {
+        var _this = this;
+        var html="";
+        //var i = 1;
+        $("#emergencylist tbody").html("");
+
+      
+        for(i in data.data.contacts.regional)
+        {
+            console.log(data.data.contacts.regional[i]['loc']);
+            var j =i+1;
+            html+="<tr>";
+            html+="<td>"+j+"</td>";
+            html+="<td>"+data.data.contacts.regional[i]['loc'];
+            html+="<td>"+data.data.contacts.regional[i]['number'];
+            html+="</tr>";
+            
+        }
+        console.log(html);
+        $("#emergencylist tbody").html(html);
+        
+
+        $('#emergencylist').dataTable({
+            "bPaginate": true,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bSort": true,
+            "bInfo": true,
+            "bAutoWidth": false
+          });
     }
 };
 
 $(document).ready(function(){
-	coronadata.init();
+    coronadata.init();
+
+   /*  setInterval(function(){
+        coronadata.init();
+      }, 3000); */
+   
 });
