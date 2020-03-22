@@ -430,7 +430,7 @@ var coronadata =
               
             onMarkerLabelShow: function(event, label, code) 
             {
-             label.html("<strong>"+label.html()+"</strong>"+_this.markupdata[code]);                
+            // label.html("<strong>"+label.html()+"</strong>"+_this.markupdata[code]);                
             },
             onRegionLabelShow: function(event, label, code){
                 /* label.html(
