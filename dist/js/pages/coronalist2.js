@@ -3,7 +3,7 @@ var coronadata =
     init:function()
 	{
         this.getDataList();
-    //    / this.getIndiaDataList();
+        this.getIndiaDataList();
     },
     datedata:[],
     coronalist:"",
@@ -16,24 +16,26 @@ var coronadata =
     indiarecoveredcount:"",
     indiadeathcount:"",
     statelist:[],
-    statecode:[],
-    swapstate:[],
-    statedata:[],
-
     
     getDataList:function()
     {
         var _this = this;
+        var _this = this;
+        var currentdate = moment().add(-1, 'days').format("MM-DD-YYYY");
+        if(_this.dateselected)
+        {
+            currentdate = _this.dateselected;
+        }
         var ajaxresult = $.ajax({
             type:"GET",
-            url:"https://raw.githubusercontent.com/datasets/covid-19/master/time-series-19-covid-combined.csv",
+            url:"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"+currentdate+".csv",
             dataType: "text", 
             success:function(data)
             {
                 data = $.csv.toArrays(data);
                 console.log(data);
                 _this.coronalist = data;
-                _this.renderMap(data);
+               // _this.renderMap(data);
             },
             error:function(error)
             {
@@ -54,12 +56,12 @@ var coronadata =
         data.forEach(function(val)
         {
             //var date = val.time.split('T')[0];
-            if (val[4] in _this.datedata) 
+            if (val[2] in _this.datedata) 
             {
-                _this.datedata[val[4]].push(val);
+                _this.datedata[val[2]].push(val);
             } else 
             {
-                _this.datedata[val[4]] = new Array(val);
+                _this.datedata[val[2]] = new Array(val);
             }
         });
 
@@ -77,19 +79,16 @@ var coronadata =
         {
             currentdate = moment().add(-2, 'days').format("YYYY-MM-DD");
         }
-        else
-        {
-            console.log('Data not found');
-        }
+       
         for(var i in _this.datedata[currentdate])
         {
             console.log("Current date data"+currentdate);
             var state="";
-            _this.worldconfirmedcount=Number(_this.worldconfirmedcount)+Number(_this.datedata[currentdate][i][5]);
+            _this.worldconfirmedcount=Number(_this.worldconfirmedcount)+Number(_this.datedata[currentdate][i][3]);
 
-            _this.worldrecoveredcount=Number(_this.worldrecoveredcount)+Number(_this.datedata[currentdate][i][6]);
+            _this.worldrecoveredcount=Number(_this.worldrecoveredcount)+Number(_this.datedata[currentdate][i][5]);
 
-            _this.worlddeathcount=Number(_this.worlddeathcount)+Number(_this.datedata[currentdate][i][7]);
+            _this.worlddeathcount=Number(_this.worlddeathcount)+Number(_this.datedata[currentdate][i][4]);
 
 
             if(_this.datedata[currentdate][i][0] != "")
@@ -97,7 +96,7 @@ var coronadata =
                // console.log(_this.datedata[currentdate][i][0]);
                 state = _this.datedata[currentdate][i][0];
             }
-            var html = "</br>State:"+state+"</br>Confrimed cases:"+_this.datedata[currentdate][i][5]+"</br>Recoverd cases:"+_this.datedata[currentdate][i][6]+"</br>Death cases:"+_this.datedata[currentdate][i][7];
+            var html = "</br>State:"+state+"</br>Confrimed cases:"+_this.datedata[currentdate][i][3]+"</br>Recoverd cases:"+_this.datedata[currentdate][i][5]+"</br>Death cases:"+_this.datedata[currentdate][i][4];
             _this.markupdata.push(html);
         }
 
@@ -245,54 +244,6 @@ var coronadata =
     
         var _this = this;
 
-        _this.statecode=[
-            ["IN-BR","Bihar"],
-            ["IN-PY","Puducherry"],
-            ["IN-DD","Daman and Diu"],
-            ["IN-DN","Dadra and Nagar Haveli"],
-            ["IN-DL","Delhi"],
-            ["IN-NL","Nagaland"],
-            ["IN-WB","West Bengal"],
-            ["IN-HR","Haryana"],
-            ["IN-HP","Himachal Pradesh"],
-            ["IN-AS","Assam"],
-            ["IN-UT","Uttaranchal"],
-            ["IN-JH","Jharkhand"],
-            ["IN-JK","Jammu and Kashmir"],
-            ["IN-UP","Uttar Pradesh"],
-            ["IN-SK","Sikkim"],
-            ["IN-MZ","Mizoram"],
-            ["IN-CT","Chhattisgarh"],
-            ["IN-CH","Chandigarh"],
-            ["IN-GA","Goa"],
-            ["IN-GJ","Gujarat"],
-            ["IN-RJ","Rajasthan"],
-            ["IN-MP","Madhya Pradesh"],
-            ["IN-OR","Orissa"],
-            ["IN-TN","Tamil Nadu"],
-            ["IN-AN","Andaman and Nicobar"],
-            ["IN-AP","Andhra Pradesh"],
-            ["IN-TR","Tripura"],
-            ["IN-AR","Arunachal Pradesh"],
-            ["IN-KA","Karnataka"],
-            ["IN-PB","Punjab"],
-            ["IN-ML","Meghalaya"],
-            ["IN-MN","Manipur"],
-            ["IN-MH","Maharashtra"],
-            ["IN-KL","Kerala"]
-            ];
-
-            $.each(_this.statecode, function( index, value ) {
-               // console.log(value);
-                _this.swapstate[value[1]] = value[0];
-              });
-
-
-            //_this.statedata[]
-            
-            console.log(data);
-            console.log(_this.statecode);
-            console.log(_this.swapstate);
 
         $('#india-map-markers').vectorMap({
             map: 'in_mill',
@@ -367,13 +318,6 @@ var coronadata =
             {
              label.html("<strong>"+label.html()+"</strong>"+_this.markupdata[code]);                
             },
-            onRegionLabelShow: function(event, label, code){
-                /* label.html(
-                  '<b>'+label.html()+'</b></br>'+
-                  '<b>Unemployment rate: </b>'+12+'%'
-                ); */
-                label.html("<strong>"+label.html()+"</strong>"+markupdata[code]+code);
-              },
            /*  onMarkerTipShow:function(event, label, code) 
             {
              label.html("<strong>"+label.html()+"</strong>"+_this.markupdata[code]);                
