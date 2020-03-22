@@ -497,17 +497,17 @@ var coronadata =
         //var i = 1;
         $("#emergencylist tbody").html("");
 
-      
+        var j=1;
         for(i in data.data.contacts.regional)
         {
             console.log(data.data.contacts.regional[i]['loc']);
-            var j =i+1;
+            //var j =i;
             html+="<tr>";
             html+="<td>"+j+"</td>";
             html+="<td>"+data.data.contacts.regional[i]['loc'];
             html+="<td>"+data.data.contacts.regional[i]['number'];
             html+="</tr>";
-            
+            ++j;
         }
         console.log(html);
         $("#emergencylist tbody").html(html);
